@@ -288,6 +288,7 @@ export default function RecordScreen() {
         } catch (e) {
             console.log('Error saving:', e);
         }
+
         setScreenState('saved');
         setTimeout(() => {
             recordingUriRef.current = null;
