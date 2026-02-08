@@ -69,14 +69,14 @@ export default function ProfileScreen() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Bubbles />
+            <Bubbles maxBubbles={7} />
             <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
                 <Text style={styles.logo}>Memory Lane</Text>
 
                 {/* Avatar + Name */}
                 <View style={styles.avatarSection}>
                     <View style={styles.avatar}>
-                        <Ionicons name="person" size={44} color="#C5B9E8" />
+                        <Ionicons name="person" size={52} color="#5A9DBF" />
                     </View>
                     <Text style={styles.userName}>{userName || 'Friend'}</Text>
                 </View>
@@ -84,12 +84,12 @@ export default function ProfileScreen() {
                 {/* Stats row */}
                 <View style={styles.statsRow}>
                     <View style={styles.statCard}>
-                        <Ionicons name="mic" size={28} color="#C0E2FE" />
+                        <Ionicons name="mic" size={34} color="#C0E2FE" />
                         <Text style={styles.statNumber}>{memoriesCount}</Text>
                         <Text style={styles.statLabel}>Memories</Text>
                     </View>
                     <View style={styles.statCard}>
-                        <Ionicons name="flame" size={28} color="#F0A050" />
+                        <Ionicons name="flame" size={34} color="#F0A050" />
                         <Text style={styles.statNumber}>{streak}</Text>
                         <Text style={styles.statLabel}>Day Streak</Text>
                     </View>
@@ -100,7 +100,7 @@ export default function ProfileScreen() {
 
                 {memories.length === 0 ? (
                     <View style={styles.emptyState}>
-                        <Ionicons name="book-outline" size={48} color="#767676" />
+                        <Ionicons name="book-outline" size={56} color="#767676" />
                         <Text style={styles.emptyText}>No memories recorded yet.</Text>
                         <Text style={styles.emptySubtext}>Head to the Record tab to share your first story!</Text>
                     </View>
@@ -118,17 +118,17 @@ export default function ProfileScreen() {
                                     {memory.prompt}
                                 </Text>
                                 <View style={styles.historyMeta}>
-                                    <Ionicons name="time-outline" size={14} color="#595959" />
+                                    <Ionicons name="time-outline" size={18} color="#595959" />
                                     <Text style={styles.historyDuration}>{formatDuration(memory.duration)}</Text>
                                     {memory.photos && memory.photos.length > 0 && (
                                         <>
-                                            <Ionicons name="image-outline" size={14} color="#595959" style={{ marginLeft: 12 }} />
+                                            <Ionicons name="image-outline" size={18} color="#595959" style={{ marginLeft: 12 }} />
                                             <Text style={styles.historyDuration}>{memory.photos.length} photos</Text>
                                         </>
                                     )}
                                 </View>
                             </View>
-                            <Ionicons name="chevron-forward" size={20} color="#767676" />
+                            <Ionicons name="chevron-forward" size={24} color="#767676" />
                         </TouchableOpacity>
                     ))
                 )}
@@ -146,50 +146,50 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#FAFBFF' },
     scroll: { paddingHorizontal: 24, paddingTop: 10, paddingBottom: 40 },
-    logo: { fontSize: 20, fontWeight: '400', color: '#595959', marginBottom: 24 },
+    logo: { fontSize: 17, fontWeight: '400', color: '#595959', marginBottom: 24 },
 
     // Avatar
     avatarSection: { alignItems: 'center', marginBottom: 28 },
     avatar: {
-        width: 90, height: 90, borderRadius: 45, backgroundColor: '#F0ECFF',
-        alignItems: 'center', justifyContent: 'center', marginBottom: 12,
+        width: 100, height: 100, borderRadius: 50, backgroundColor: '#E8F0F8',
+        alignItems: 'center', justifyContent: 'center', marginBottom: 14,
         ...Platform.select({
             ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 6 },
             android: { elevation: 3 },
         }),
     },
-    userName: { fontSize: 28, fontWeight: '700', color: '#1A1A2E' },
+    userName: { fontSize: 29, fontWeight: '700', color: '#1A1A2E' },
 
     // Stats
     statsRow: { flexDirection: 'row', gap: 16, marginBottom: 30 },
     statCard: {
-        flex: 1, backgroundColor: '#fff', borderRadius: 16, padding: 20,
+        flex: 1, backgroundColor: '#fff', borderRadius: 20, padding: 24,
         alignItems: 'center', borderWidth: 1.5, borderColor: '#E8EEF2',
         ...Platform.select({
             ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 6 },
             android: { elevation: 2 },
         }),
     },
-    statNumber: { fontSize: 32, fontWeight: '700', color: '#1A1A2E', marginTop: 8 },
-    statLabel: { fontSize: 16, fontWeight: '500', color: '#505050', marginTop: 2 },
+    statNumber: { fontSize: 33, fontWeight: '700', color: '#1A1A2E', marginTop: 8 },
+    statLabel: { fontSize: 14, fontWeight: '500', color: '#505050', marginTop: 4 },
 
     // History
-    sectionTitle: { fontSize: 24, fontWeight: '700', color: '#1A1A2E', marginBottom: 16 },
+    sectionTitle: { fontSize: 25, fontWeight: '700', color: '#1A1A2E', marginBottom: 18 },
     emptyState: { alignItems: 'center', paddingVertical: 40 },
-    emptyText: { fontSize: 20, fontWeight: '600', color: '#595959', marginTop: 12 },
-    emptySubtext: { fontSize: 16, color: '#595959', marginTop: 6, textAlign: 'center' },
+    emptyText: { fontSize: 19, fontWeight: '600', color: '#595959', marginTop: 14 },
+    emptySubtext: { fontSize: 14, color: '#595959', marginTop: 8, textAlign: 'center' },
 
     historyCard: {
         flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff',
-        borderRadius: 14, padding: 18, marginBottom: 12, borderWidth: 1.5, borderColor: '#E8EEF2',
+        borderRadius: 18, padding: 22, marginBottom: 14, borderWidth: 1.5, borderColor: '#E8EEF2',
         ...Platform.select({
             ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4 },
             android: { elevation: 1 },
         }),
     },
     historyLeft: { flex: 1 },
-    historyDate: { fontSize: 14, fontWeight: '700', color: '#4A7A99', marginBottom: 4 },
-    historyPrompt: { fontSize: 18, fontWeight: '600', color: '#1A1A2E', lineHeight: 24, marginBottom: 6 },
-    historyMeta: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-    historyDuration: { fontSize: 14, color: '#595959' },
+    historyDate: { fontSize: 13, fontWeight: '700', color: '#4A7A99', marginBottom: 6 },
+    historyPrompt: { fontSize: 17, fontWeight: '600', color: '#1A1A2E', lineHeight: 24, marginBottom: 8 },
+    historyMeta: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+    historyDuration: { fontSize: 13, color: '#595959' },
 });

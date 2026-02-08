@@ -141,16 +141,16 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     logo: {
-        fontSize: 20,
+        fontSize: 17,
         fontWeight: '400',
         color: '#595959',
         marginBottom: 4,
     },
     greeting: {
-        fontSize: 30,
+        fontSize: 35,
         fontWeight: '700',
         color: '#1A1A2E',
-        marginBottom: 4,
+        marginBottom: 6,
     },
     date: {
         fontSize: 19,
@@ -161,10 +161,10 @@ const styles = StyleSheet.create({
         marginHorizontal: 20,
         marginBottom: 24,
         backgroundColor: '#E8EEF8',
-        borderRadius: 16,
+        borderRadius: 20,
         borderWidth: 1.5,
         borderColor: '#C8D4E4',
-        padding: 22,
+        padding: 28,
         ...Platform.select({
             ios: {
                 shadowColor: '#000',
@@ -178,25 +178,25 @@ const styles = StyleSheet.create({
         }),
     },
     promptLabel: {
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: '700',
         color: '#1A1A2E',
         letterSpacing: 0.5,
-        marginBottom: 12,
+        marginBottom: 14,
     },
     promptText: {
-        fontSize: 22,
+        fontSize: 23,
         fontWeight: '500',
         color: '#1A1A2E',
-        lineHeight: 32,
-        marginBottom: 18,
+        lineHeight: 34,
+        marginBottom: 20,
     },
     recordButton: {
         backgroundColor: '#C0E2FE',
-        paddingVertical: 14,
-        paddingHorizontal: 32,
-        borderRadius: 25,
-        alignSelf: 'flex-start',
+        paddingVertical: 20,
+        paddingHorizontal: 40,
+        borderRadius: 30,
+        alignItems: 'center',
         borderWidth: 1.5,
         borderColor: '#C0C8D4',
         ...Platform.select({
@@ -212,8 +212,8 @@ const styles = StyleSheet.create({
         }),
     },
     recordButtonText: {
-        fontSize: 18,
-        fontWeight: '600',
+        fontSize: 17,
+        fontWeight: '700',
         color: '#1A1A2E',
     },
 });

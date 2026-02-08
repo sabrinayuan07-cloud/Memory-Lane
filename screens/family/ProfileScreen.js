@@ -45,7 +45,7 @@ export default function ProfileScreen() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Bubbles />
+            <Bubbles maxBubbles={5} />
             <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
                 <Text style={styles.logo}>Memory Lane</Text>
                 <Text style={styles.title}>{lovedOneName}'s Progress</Text>

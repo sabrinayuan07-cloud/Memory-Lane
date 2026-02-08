@@ -69,7 +69,7 @@ export default function OnboardingScreen({ navigation }) {
             } catch (e) {
                 console.log('Error saving data:', e);
             }
-            navigation.replace('MainTabs');
+            navigation.replace('Tutorial');
         }
     };
 
@@ -373,7 +373,7 @@ export default function OnboardingScreen({ navigation }) {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Bubbles />
+            <Bubbles maxBubbles={7} />
 
             <KeyboardAvoidingView
                 style={styles.flex}

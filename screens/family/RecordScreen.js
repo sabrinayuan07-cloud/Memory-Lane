@@ -75,7 +75,7 @@ export default function RecordScreen({ navigation }) {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Bubbles />
+            <Bubbles maxBubbles={5} />
             <ScrollView style={styles.content} contentContainerStyle={styles.scrollContent}>
                 <Text style={styles.logo}>Memory Lane</Text>
                 <Text style={styles.title}>Add a Memory</Text>
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
         marginBottom: 30,
     },
     section: {
-        marginBottom: 30,
+        marginBottom: 22,
     },
     sectionLabel: {
         fontSize: 14,
@@ -221,13 +221,14 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#1A1A2E',
         backgroundColor: '#fff',
-        minHeight: 150,
+        minHeight: 120,
     },
     saveButton: {
         backgroundColor: '#A8C5A9',
         paddingVertical: 16,
         borderRadius: 30,
         alignItems: 'center',
+        marginBottom: 30,
         ...Platform.select({
             ios: {
                 shadowColor: '#000',

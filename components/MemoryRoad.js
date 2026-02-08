@@ -52,11 +52,16 @@ const generateSmoothPath = (points) => {
   return d;
 };
 
-// 3D circle component
-const Circle3D = ({ size, hasMemory, icon, onPress, disabled, style }) => {
-  const baseColor = hasMemory ? '#2A6F97' : '#B8D4E3';
-  const darkColor = hasMemory ? '#1E5A7A' : '#9BBDD1';
-  const lightColor = hasMemory ? '#5A9DBF' : '#D6E8F0';
+// 3D circle component - supports blue (senior) and green (family) colors
+const Circle3D = ({ size, hasMemory, isFamily, icon, onPress, disabled, style }) => {
+  let baseColor, darkColor, lightColor;
+  if (!hasMemory) {
+    baseColor = '#B8D4E3'; darkColor = '#9BBDD1'; lightColor = '#D6E8F0';
+  } else if (isFamily) {
+    baseColor = '#5A7A5C'; darkColor = '#4A6A4C'; lightColor = '#7A9A7C';
+  } else {
+    baseColor = '#2A6F97'; darkColor = '#1E5A7A'; lightColor = '#5A9DBF';
+  }
 
   return (
     <TouchableOpacity
@@ -147,7 +152,7 @@ export default function MemoryRoad({ memories, onCirclePress }) {
         />
       </Svg>
 
-      {/* Dark blue 3D circles with icons and labels */}
+      {/* 3D circles - blue for senior memories, green for family-added */}
       {points.map((point, index) => {
         const hasMemory = index < memories.length;
         const memory = hasMemory ? memories[index] : null;
@@ -159,6 +164,7 @@ export default function MemoryRoad({ memories, onCirclePress }) {
             <Circle3D
               size={circleSize}
               hasMemory={hasMemory}
+              isFamily={hasMemory && memory.addedByFamily}
               icon={icon}
               onPress={() => hasMemory && onCirclePress(memory, index)}
               disabled={!hasMemory}

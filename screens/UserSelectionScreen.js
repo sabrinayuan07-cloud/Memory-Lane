@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   Platform,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Bubbles from '../components/Bubbles';
 
@@ -29,12 +30,21 @@ export default function UserSelectionScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Bubbles forceMixed />
+      <Bubbles forceMixed maxBubbles={7} />
 
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.logo}>Memory Lane</Text>
       </View>
+
+      {/* Back arrow */}
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+        activeOpacity={0.7}
+      >
+        <Text style={styles.backArrow}>←</Text>
+      </TouchableOpacity>
 
       <View style={styles.content}>
         <View style={styles.spacer} />
@@ -155,5 +165,33 @@ const styles = StyleSheet.create({
   },
   bottomSpacer: {
     flex: 1,
+  },
+  backButton: {
+    position: 'absolute',
+    bottom: 40,
+    left: 30,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#C0E2FE',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.12,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
+  },
+  backArrow: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1A1A2E',
   },
 });

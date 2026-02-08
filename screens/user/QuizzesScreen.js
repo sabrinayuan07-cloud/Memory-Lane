@@ -294,24 +294,24 @@ export default function QuizzesScreen() {
 
             <TouchableOpacity style={styles.categoryCard} onPress={() => startQuiz('memory')} activeOpacity={0.7}>
                 <View style={styles.categoryIcon}>
-                    <Ionicons name="heart" size={32} color="#C5B9E8" />
+                    <Ionicons name="heart" size={36} color="#5A9DBF" />
                 </View>
                 <View style={styles.categoryInfo}>
                     <Text style={styles.categoryTitle}>Memory Quiz</Text>
                     <Text style={styles.categoryDesc}>Questions based on your own stories and memories</Text>
                 </View>
-                <Ionicons name="chevron-forward" size={24} color="#595959" />
+                <Ionicons name="chevron-forward" size={28} color="#595959" />
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.categoryCard} onPress={() => startQuiz('pop')} activeOpacity={0.7}>
                 <View style={styles.categoryIcon}>
-                    <Ionicons name="bulb" size={32} color="#F0C36D" />
+                    <Ionicons name="bulb" size={36} color="#F0C36D" />
                 </View>
                 <View style={styles.categoryInfo}>
                     <Text style={styles.categoryTitle}>Pop Quiz</Text>
                     <Text style={styles.categoryDesc}>Fun nostalgia questions from music, history, and culture</Text>
                 </View>
-                <Ionicons name="chevron-forward" size={24} color="#595959" />
+                <Ionicons name="chevron-forward" size={28} color="#595959" />
             </TouchableOpacity>
         </ScrollView>
     );
@@ -323,7 +323,7 @@ export default function QuizzesScreen() {
                 {/* Progress */}
                 <View style={styles.quizHeader}>
                     <TouchableOpacity onPress={() => setView('categories')}>
-                        <Ionicons name="arrow-back" size={28} color="#1A1A2E" />
+                        <Ionicons name="arrow-back" size={34} color="#1A1A2E" />
                     </TouchableOpacity>
                     <Text style={styles.quizProgress}>
                         {currentQ + 1} of {questions.length}
@@ -382,7 +382,7 @@ export default function QuizzesScreen() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Bubbles />
+            <Bubbles maxBubbles={7} />
             <View style={styles.content}>
                 <Text style={styles.logo}>Memory Lane</Text>
                 {view === 'categories' && renderCategories()}
@@ -396,61 +396,61 @@ export default function QuizzesScreen() {
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#FAFBFF' },
     content: { flex: 1, paddingHorizontal: 24, paddingTop: 10 },
-    logo: { fontSize: 20, fontWeight: '400', color: '#595959', marginBottom: 20 },
+    logo: { fontSize: 17, fontWeight: '400', color: '#595959', marginBottom: 20 },
 
     // Categories
     categoriesScroll: { paddingBottom: 40 },
-    pageTitle: { fontSize: 32, fontWeight: '700', color: '#1A1A2E', marginBottom: 6 },
-    pageSubtitle: { fontSize: 18, color: '#505050', marginBottom: 30 },
+    pageTitle: { fontSize: 35, fontWeight: '700', color: '#1A1A2E', marginBottom: 8 },
+    pageSubtitle: { fontSize: 17, color: '#505050', marginBottom: 30 },
     categoryCard: {
         flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff',
-        borderRadius: 16, padding: 20, marginBottom: 16, borderWidth: 1.5, borderColor: '#E8EEF2',
+        borderRadius: 20, padding: 24, marginBottom: 18, borderWidth: 1.5, borderColor: '#E8EEF2',
         ...Platform.select({
             ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 6 },
             android: { elevation: 3 },
         }),
     },
     categoryIcon: {
-        width: 60, height: 60, borderRadius: 30, backgroundColor: '#F5F0FF',
-        alignItems: 'center', justifyContent: 'center', marginRight: 16,
+        width: 70, height: 70, borderRadius: 35, backgroundColor: '#E8F0F8',
+        alignItems: 'center', justifyContent: 'center', marginRight: 18,
     },
     categoryInfo: { flex: 1 },
-    categoryTitle: { fontSize: 22, fontWeight: '700', color: '#1A1A2E', marginBottom: 4 },
-    categoryDesc: { fontSize: 16, color: '#505050', lineHeight: 22 },
+    categoryTitle: { fontSize: 21, fontWeight: '700', color: '#1A1A2E', marginBottom: 6 },
+    categoryDesc: { fontSize: 14, color: '#505050', lineHeight: 21 },
 
     // Quiz
     quizScroll: { paddingBottom: 40 },
     quizHeader: { flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 16 },
-    quizProgress: { fontSize: 18, fontWeight: '600', color: '#505050' },
+    quizProgress: { fontSize: 15, fontWeight: '600', color: '#505050' },
     quizProgressBar: {
-        height: 6, backgroundColor: '#E8E8E8', borderRadius: 3, marginBottom: 30, overflow: 'hidden',
+        height: 8, backgroundColor: '#E8E8E8', borderRadius: 4, marginBottom: 30, overflow: 'hidden',
     },
-    quizProgressFill: { height: 6, backgroundColor: '#C5B9E8', borderRadius: 3 },
+    quizProgressFill: { height: 8, backgroundColor: '#5A9DBF', borderRadius: 4 },
     quizPhoto: {
-        width: '100%', height: 200, borderRadius: 16, marginBottom: 20,
+        width: '100%', height: 220, borderRadius: 18, marginBottom: 24,
     },
-    questionText: { fontSize: 26, fontWeight: '700', color: '#1A1A2E', lineHeight: 36, marginBottom: 30 },
-    optionsArea: { gap: 14 },
+    questionText: { fontSize: 27, fontWeight: '700', color: '#1A1A2E', lineHeight: 38, marginBottom: 30 },
+    optionsArea: { gap: 16 },
     optionBtn: {
         backgroundColor: '#C0E2FE', paddingVertical: 18, paddingHorizontal: 24,
-        borderRadius: 16, borderWidth: 1.5, borderColor: '#C0C8D4',
+        borderRadius: 20, borderWidth: 1.5, borderColor: '#C0C8D4',
         ...Platform.select({
             ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.12, shadowRadius: 5 },
             android: { elevation: 3 },
         }),
     },
-    optionText: { fontSize: 20, fontWeight: '600', color: '#1A1A2E', textAlign: 'center' },
+    optionText: { fontSize: 19, fontWeight: '600', color: '#1A1A2E', textAlign: 'center' },
 
     // Feedback
     feedbackArea: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
-    feedbackEmoji: { fontSize: 60, marginBottom: 16 },
-    feedbackText: { fontSize: 24, fontWeight: '700', color: '#1A1A2E', textAlign: 'center', lineHeight: 34 },
+    feedbackEmoji: { fontSize: 70, marginBottom: 20 },
+    feedbackText: { fontSize: 25, fontWeight: '700', color: '#1A1A2E', textAlign: 'center', lineHeight: 36 },
 
     // Result
     resultArea: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 20 },
-    resultEmoji: { fontSize: 70, marginBottom: 16 },
-    resultTitle: { fontSize: 34, fontWeight: '700', color: '#1A1A2E', marginBottom: 12 },
-    resultMessage: { fontSize: 20, color: '#555', textAlign: 'center', lineHeight: 30, marginBottom: 30 },
+    resultEmoji: { fontSize: 80, marginBottom: 20 },
+    resultTitle: { fontSize: 37, fontWeight: '700', color: '#1A1A2E', marginBottom: 14 },
+    resultMessage: { fontSize: 19, color: '#505050', textAlign: 'center', lineHeight: 30, marginBottom: 34 },
     resultButton: {
         backgroundColor: '#C0E2FE', paddingVertical: 16, paddingHorizontal: 40,
         borderRadius: 30, borderWidth: 1.5, borderColor: '#C0C8D4',
@@ -459,5 +459,5 @@ const styles = StyleSheet.create({
             android: { elevation: 4 },
         }),
     },
-    resultButtonText: { fontSize: 20, fontWeight: '600', color: '#1A1A2E' },
+    resultButtonText: { fontSize: 19, fontWeight: '600', color: '#1A1A2E' },
 });

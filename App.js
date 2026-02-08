@@ -1,4 +1,5 @@
 import React from 'react';
+import { View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -13,6 +14,7 @@ import HomeScreen from './screens/user/HomeScreen';
 import RecordScreen from './screens/user/RecordScreen';
 import QuizzesScreen from './screens/user/QuizzesScreen';
 import ProfileScreen from './screens/user/ProfileScreen';
+import TutorialScreen from './screens/user/TutorialScreen';
 
 // Family screens
 import FamilyOnboarding from './screens/family/OnBoarding';
@@ -23,7 +25,7 @@ import FamilyProfileScreen from './screens/family/ProfileScreen';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// Senior/User Tabs (Blue theme)
+// Senior/User Tabs (Blue theme) - LARGE for elderly users
 function MainTabs() {
     return (
         <Tab.Navigator
@@ -40,7 +42,7 @@ function MainTabs() {
                     } else if (route.name === 'Profile') {
                         iconName = focused ? 'person' : 'person-outline';
                     }
-                    return <Ionicons name={iconName} size={34} color={color} />;
+                    return <Ionicons name={iconName} size={28} color={color} />;
                 },
                 tabBarActiveTintColor: '#1A1A2E',
                 tabBarInactiveTintColor: '#595959',
@@ -49,11 +51,11 @@ function MainTabs() {
                     borderTopWidth: 1,
                     borderTopColor: '#E0E0E0',
                     paddingBottom: 30,
-                    paddingTop: 14,
+                    paddingTop: 12,
                     height: 105,
                 },
                 tabBarLabelStyle: {
-                    fontSize: 15,
+                    fontSize: 20,
                     fontWeight: '700',
                 },
             })}
@@ -66,22 +68,32 @@ function MainTabs() {
     );
 }
 
-// Family Tabs (Green theme)
+// Family Tabs (Green theme) - icon-only, no labels
 function FamilyTabs() {
     return (
         <Tab.Navigator
             screenOptions={({ route }) => ({
                 headerShown: false,
+                tabBarShowLabel: false,
                 tabBarIcon: ({ focused, color, size }) => {
+                    if (route.name === 'AddMemory') {
+                        return (
+                            <View style={{
+                                width: 44, height: 44, borderRadius: 22,
+                                borderWidth: 2.5, borderColor: color,
+                                alignItems: 'center', justifyContent: 'center',
+                            }}>
+                                <Ionicons name="add" size={28} color={color} />
+                            </View>
+                        );
+                    }
                     let iconName;
                     if (route.name === 'FamilyHome') {
                         iconName = focused ? 'home' : 'home-outline';
-                    } else if (route.name === 'AddMemory') {
-                        iconName = focused ? 'add-circle' : 'add-circle-outline';
                     } else if (route.name === 'Updates') {
                         iconName = focused ? 'person' : 'person-outline';
                     }
-                    return <Ionicons name={iconName} size={34} color={color} />;
+                    return <Ionicons name={iconName} size={30} color={color} />;
                 },
                 tabBarActiveTintColor: '#1A1A2E',
                 tabBarInactiveTintColor: '#595959',
@@ -89,31 +101,15 @@ function FamilyTabs() {
                     backgroundColor: '#F5F5F5',
                     borderTopWidth: 1,
                     borderTopColor: '#E0E0E0',
-                    paddingBottom: 30,
+                    paddingBottom: 26,
                     paddingTop: 14,
-                    height: 105,
-                },
-                tabBarLabelStyle: {
-                    fontSize: 15,
-                    fontWeight: '700',
+                    height: 80,
                 },
             })}
         >
-            <Tab.Screen 
-                name="FamilyHome" 
-                component={FamilyHomeScreen}
-                options={{ tabBarLabel: 'Home' }}
-            />
-            <Tab.Screen 
-                name="AddMemory" 
-                component={FamilyRecordScreen}
-                options={{ tabBarLabel: 'Add Memory' }}
-            />
-            <Tab.Screen 
-                name="Updates" 
-                component={FamilyProfileScreen}
-                options={{ tabBarLabel: 'Updates' }}
-            />
+            <Tab.Screen name="FamilyHome" component={FamilyHomeScreen} />
+            <Tab.Screen name="AddMemory" component={FamilyRecordScreen} />
+            <Tab.Screen name="Updates" component={FamilyProfileScreen} />
         </Tab.Navigator>
     );
 }
@@ -128,6 +124,7 @@ export default function App() {
                 <Stack.Screen name="Welcome" component={WelcomeScreen} />
                 <Stack.Screen name="UserSelection" component={UserSelectionScreen} />
                 <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+                <Stack.Screen name="Tutorial" component={TutorialScreen} />
                 <Stack.Screen name="FamilyOnboarding" component={FamilyOnboarding} />
                 <Stack.Screen
                     name="MainTabs"

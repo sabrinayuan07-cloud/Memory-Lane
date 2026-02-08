@@ -8,7 +8,8 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
-import FamilyMemoryRoad from '../../components/FamilyMemoryRoad';
+import MemoryRoad from '../../components/MemoryRoad';
+import MemoryPopup from '../../components/MemoryPopup';
 
 const getGreeting = () => {
     const hour = new Date().getHours();
@@ -27,15 +28,17 @@ const getFormattedDate = () => {
 };
 
 export default function HomeScreen({ navigation }) {
-    const [lovedOneName, setLovedOneName] = useState('');
+    const [relationship, setRelationship] = useState('');
     const [memories, setMemories] = useState([]);
+    const [selectedMemory, setSelectedMemory] = useState(null);
+    const [popupVisible, setPopupVisible] = useState(false);
 
     useFocusEffect(
         useCallback(() => {
             const loadData = async () => {
                 try {
-                    const name = await AsyncStorage.getItem('lovedOneName');
-                    if (name) setLovedOneName(name);
+                    const rel = await AsyncStorage.getItem('relationship');
+                    if (rel) setRelationship(rel);
 
                     const memoriesData = await AsyncStorage.getItem('memories');
                     const memList = memoriesData ? JSON.parse(memoriesData) : [];
@@ -48,6 +51,11 @@ export default function HomeScreen({ navigation }) {
         }, [])
     );
 
+    const handleCirclePress = (memory) => {
+        setSelectedMemory(memory);
+        setPopupVisible(true);
+    };
+
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView
@@ -59,14 +67,24 @@ export default function HomeScreen({ navigation }) {
                 <View style={styles.header}>
                     <Text style={styles.logo}>Memory Lane</Text>
                     <Text style={styles.greeting}>
-                        {lovedOneName ? `${lovedOneName}'s Memories` : "Mom's Memories"}
+                        {relationship ? `${relationship}'s Memories` : "Mom's Memories"}
                     </Text>
                     <Text style={styles.date}>{getFormattedDate()}</Text>
                 </View>
 
-                {/* Memory Lane Road Map with Green Circles */}
-                <FamilyMemoryRoad memories={memories} />
+                {/* Shared Memory Lane Road Map - same as senior, with color-coded circles */}
+                <MemoryRoad
+                    memories={memories}
+                    onCirclePress={handleCirclePress}
+                />
             </ScrollView>
+
+            {/* Memory Popup */}
+            <MemoryPopup
+                visible={popupVisible}
+                memory={selectedMemory}
+                onClose={() => setPopupVisible(false)}
+            />
         </SafeAreaView>
     );
 }

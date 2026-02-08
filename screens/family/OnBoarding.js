@@ -86,13 +86,15 @@ export default function OnBoarding({ navigation }) {
 
     const renderStep2 = () => (
         <View style={styles.stepContent}>
-            <Text style={styles.stepTitle}>What's your relationship?</Text>
+            <Text style={styles.stepTitle}>
+                What do you call {lovedOneName || 'them'}?
+            </Text>
             <Text style={styles.stepSubtitle}>
-                e.g., Daughter, Son, Grandchild, Caregiver
+                e.g., Mom, Dad, Grandma, Grandpa, Nana
             </Text>
             <TextInput
                 style={styles.textInput}
-                placeholder="Enter your relationship"
+                placeholder="e.g. Mom, Dad, Grandma"
                 placeholderTextColor="#595959"
                 value={relationship}
                 onChangeText={setRelationship}
@@ -103,7 +105,7 @@ export default function OnBoarding({ navigation }) {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Bubbles />
+            <Bubbles maxBubbles={5} />
 
             <KeyboardAvoidingView
                 style={styles.flex}
@@ -169,7 +171,7 @@ const styles = StyleSheet.create({
         borderRadius: 2.5,
     },
     progressBarActive: {
-        backgroundColor: '#1A1A2E',
+        backgroundColor: '#5A7A5C',
     },
     progressBarInactive: {
         backgroundColor: '#D9D9D9',
@@ -215,7 +217,7 @@ const styles = StyleSheet.create({
         width: 56,
         height: 56,
         borderRadius: 28,
-        backgroundColor: '#C0E2FE',
+        backgroundColor: '#A8C5A9',
         alignItems: 'center',
         justifyContent: 'center',
         ...Platform.select({
