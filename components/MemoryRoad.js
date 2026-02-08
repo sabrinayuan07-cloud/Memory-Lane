@@ -54,9 +54,9 @@ const generateSmoothPath = (points) => {
 
 // 3D circle component
 const Circle3D = ({ size, hasMemory, icon, onPress, disabled, style }) => {
-  const baseColor = hasMemory ? '#C5B9E8' : '#E8E2F5';
-  const darkColor = hasMemory ? '#A89BD0' : '#D6CEE8';
-  const lightColor = hasMemory ? '#DDD4F2' : '#F0ECF8';
+  const baseColor = hasMemory ? '#2A6F97' : '#B8D4E3';
+  const darkColor = hasMemory ? '#1E5A7A' : '#9BBDD1';
+  const lightColor = hasMemory ? '#5A9DBF' : '#D6E8F0';
 
   return (
     <TouchableOpacity
@@ -139,7 +139,7 @@ export default function MemoryRoad({ memories, onCirclePress }) {
       >
         <Path
           d={pathD}
-          stroke="#E0D8F0"
+          stroke="#B8D4E3"
           strokeWidth={3}
           fill="none"
           strokeDasharray="10,8"
@@ -147,7 +147,7 @@ export default function MemoryRoad({ memories, onCirclePress }) {
         />
       </Svg>
 
-      {/* Purple 3D circles with icons and labels */}
+      {/* Dark blue 3D circles with icons and labels */}
       {points.map((point, index) => {
         const hasMemory = index < memories.length;
         const memory = hasMemory ? memories[index] : null;
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     ...Platform.select({
       ios: {
-        shadowColor: '#8B7FC7',
+        shadowColor: '#1E5A7A',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.35,
         shadowRadius: 6,

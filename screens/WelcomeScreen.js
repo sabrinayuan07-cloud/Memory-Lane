@@ -12,7 +12,7 @@ import Bubbles from '../components/Bubbles';
 export default function WelcomeScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
-      <Bubbles animated />
+      <Bubbles animated showGreen />
 
       <View style={styles.content}>
         {/* Title pushed toward upper portion */}

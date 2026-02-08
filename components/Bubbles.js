@@ -4,8 +4,9 @@ import { View, StyleSheet, Animated, Easing, Dimensions } from 'react-native';
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const BUBBLE_COLOR = '#C0E2FE';
+const GREEN_BUBBLE_COLOR = '#D7E6DA';
 
-const AnimatedBubble = ({ size, top, left, right, bottom, animated, delay = 0 }) => {
+const AnimatedBubble = ({ size, top, left, right, bottom, animated, delay = 0, color = BUBBLE_COLOR }) => {
   const translateY = useRef(new Animated.Value(animated ? SCREEN_HEIGHT : 0)).current;
   const animOpacity = useRef(new Animated.Value(animated ? 0 : 0.75)).current;
 
@@ -38,6 +39,7 @@ const AnimatedBubble = ({ size, top, left, right, bottom, animated, delay = 0 })
           width: size,
           height: size,
           borderRadius: size / 2,
+          backgroundColor: color,
           opacity: animated ? animOpacity : 0.75,
           transform: animated ? [{ translateY }] : [],
           ...(top !== undefined && { top }),
@@ -50,7 +52,7 @@ const AnimatedBubble = ({ size, top, left, right, bottom, animated, delay = 0 })
   );
 };
 
-export default function Bubbles({ animated = false }) {
+export default function Bubbles({ animated = false, showGreen = false }) {
   return (
     <View style={styles.container} pointerEvents="none">
       {/* Top-left */}
@@ -72,6 +74,17 @@ export default function Bubbles({ animated = false }) {
       {/* Bottom-right */}
       <AnimatedBubble size={110} bottom={-15} right={-30} animated={animated} delay={250} />
       <AnimatedBubble size={50} bottom={70} right={25} animated={animated} delay={450} />
+
+      {/* Green bubbles - only shown when showGreen is true */}
+      {showGreen && (
+        <>
+          <AnimatedBubble size={100} top={'15%'} left={10} animated={animated} delay={350} color={GREEN_BUBBLE_COLOR} />
+          <AnimatedBubble size={75} top={'45%'} right={5} animated={animated} delay={480} color={GREEN_BUBBLE_COLOR} />
+          <AnimatedBubble size={120} bottom={140} right={-20} animated={animated} delay={320} color={GREEN_BUBBLE_COLOR} />
+          <AnimatedBubble size={65} bottom={40} left={60} animated={animated} delay={520} color={GREEN_BUBBLE_COLOR} />
+          <AnimatedBubble size={85} top={'55%'} left={-20} animated={animated} delay={420} color={GREEN_BUBBLE_COLOR} />
+        </>
+      )}
     </View>
   );
 }
@@ -82,6 +95,5 @@ const styles = StyleSheet.create({
   },
   bubble: {
     position: 'absolute',
-    backgroundColor: BUBBLE_COLOR,
   },
 });
