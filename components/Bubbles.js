@@ -1,71 +1,77 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, StyleSheet, Animated, Easing, Dimensions } from 'react-native';
 
-const Bubble = ({ size, top, left, right, bottom, opacity = 0.3 }) => (
-  <View
-    style={[
-      styles.bubble,
-      {
-        width: size,
-        height: size,
-        borderRadius: size / 2,
-        opacity,
-        ...(top !== undefined && { top }),
-        ...(left !== undefined && { left }),
-        ...(right !== undefined && { right }),
-        ...(bottom !== undefined && { bottom }),
-      },
-    ]}
-  />
-);
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-export default function Bubbles() {
+const BUBBLE_COLOR = '#C0E2FE';
+
+const AnimatedBubble = ({ size, top, left, right, bottom, animated, delay = 0 }) => {
+  const translateY = useRef(new Animated.Value(animated ? SCREEN_HEIGHT : 0)).current;
+  const animOpacity = useRef(new Animated.Value(animated ? 0 : 0.75)).current;
+
+  useEffect(() => {
+    if (animated) {
+      Animated.parallel([
+        Animated.timing(translateY, {
+          toValue: 0,
+          duration: 1800,
+          delay,
+          easing: Easing.out(Easing.back(1.1)),
+          useNativeDriver: true,
+        }),
+        Animated.timing(animOpacity, {
+          toValue: 0.75,
+          duration: 1400,
+          delay,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, []);
+
+  return (
+    <Animated.View
+      style={[
+        styles.bubble,
+        {
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          opacity: animated ? animOpacity : 0.75,
+          transform: animated ? [{ translateY }] : [],
+          ...(top !== undefined && { top }),
+          ...(left !== undefined && { left }),
+          ...(right !== undefined && { right }),
+          ...(bottom !== undefined && { bottom }),
+        },
+      ]}
+    />
+  );
+};
+
+export default function Bubbles({ animated = false }) {
   return (
     <View style={styles.container} pointerEvents="none">
-      {/* Top-left area */}
-      <Bubble size={120} top={-35} left={-40} opacity={0.18} />
-      <Bubble size={55} top={50} left={20} opacity={0.14} />
-      <Bubble size={30} top={110} left={60} opacity={0.12} />
+      {/* Top-left */}
+      <AnimatedBubble size={160} top={-45} left={-50} animated={animated} delay={200} />
+      <AnimatedBubble size={70} top={80} left={20} animated={animated} delay={450} />
 
-      {/* Top-right area */}
-      <Bubble size={95} top={-25} right={-25} opacity={0.22} />
-      <Bubble size={38} top={45} right={15} opacity={0.13} />
-      <Bubble size={22} top={100} right={55} opacity={0.1} />
+      {/* Top-right */}
+      <AnimatedBubble size={130} top={-30} right={-35} animated={animated} delay={150} />
+      <AnimatedBubble size={55} top={75} right={15} animated={animated} delay={400} />
 
-      {/* Left edge - mid area */}
-      <Bubble size={65} top={'28%'} left={-25} opacity={0.15} />
-      <Bubble size={28} top={'35%'} left={10} opacity={0.1} />
+      {/* Mid edges */}
+      <AnimatedBubble size={90} top={'30%'} left={-30} animated={animated} delay={550} />
+      <AnimatedBubble size={80} top={'28%'} right={-25} animated={animated} delay={500} />
 
-      {/* Right edge - mid area */}
-      <Bubble size={50} top={'25%'} right={-15} opacity={0.14} />
-      <Bubble size={20} top={'32%'} right={20} opacity={0.1} />
+      {/* Bottom-left */}
+      <AnimatedBubble size={140} bottom={15} left={-45} animated={animated} delay={300} />
+      <AnimatedBubble size={60} bottom={100} left={40} animated={animated} delay={500} />
 
-      {/* Left side - lower mid */}
-      <Bubble size={42} top={'58%'} left={-10} opacity={0.13} />
-      <Bubble size={18} top={'63%'} left={30} opacity={0.09} />
-
-      {/* Right side - lower mid */}
-      <Bubble size={55} top={'55%'} right={-20} opacity={0.15} />
-      <Bubble size={25} top={'62%'} right={10} opacity={0.1} />
-
-      {/* Bottom-left area */}
-      <Bubble size={105} bottom={30} left={-35} opacity={0.2} />
-      <Bubble size={48} bottom={90} left={35} opacity={0.14} />
-      <Bubble size={25} bottom={130} left={70} opacity={0.1} />
-
-      {/* Bottom-right area */}
-      <Bubble size={80} bottom={-15} right={-20} opacity={0.18} />
-      <Bubble size={35} bottom={50} right={25} opacity={0.13} />
-      <Bubble size={18} bottom={95} right={60} opacity={0.09} />
-
-      {/* Bottom center-ish (off to sides) */}
-      <Bubble size={40} bottom={10} left={'30%'} opacity={0.11} />
-      <Bubble size={30} bottom={60} right={'28%'} opacity={0.1} />
-
-      {/* Tiny accents scattered */}
-      <Bubble size={14} top={160} left={'20%'} opacity={0.08} />
-      <Bubble size={16} top={'45%'} right={40} opacity={0.08} />
-      <Bubble size={12} bottom={160} left={50} opacity={0.07} />
+      {/* Bottom-right */}
+      <AnimatedBubble size={110} bottom={-15} right={-30} animated={animated} delay={250} />
+      <AnimatedBubble size={50} bottom={70} right={25} animated={animated} delay={450} />
     </View>
   );
 }
@@ -76,6 +82,6 @@ const styles = StyleSheet.create({
   },
   bubble: {
     position: 'absolute',
-    backgroundColor: '#A8D8EA',
+    backgroundColor: BUBBLE_COLOR,
   },
 });

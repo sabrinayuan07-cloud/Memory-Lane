@@ -22,7 +22,7 @@ export default function UserSelectionScreen({ navigation }) {
 
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.logo}>MemoryLane</Text>
+        <Text style={styles.logo}>Memory Lane</Text>
       </View>
 
       <View style={styles.content}>
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   logo: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '400',
     color: '#B0B0B0',
   },
@@ -95,11 +95,11 @@ const styles = StyleSheet.create({
     flex: 0.6,
   },
   heading: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: '700',
     color: '#1A1A2E',
     textAlign: 'center',
-    lineHeight: 38,
+    lineHeight: 42,
     marginBottom: 50,
   },
   optionsContainer: {
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   optionButton: {
-    paddingVertical: 14,
+    paddingVertical: 16,
     paddingHorizontal: 35,
     borderRadius: 30,
     borderWidth: 1.5,
@@ -131,16 +131,16 @@ const styles = StyleSheet.create({
     }),
   },
   optionButtonText: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '700',
     color: '#1A1A2E',
     textAlign: 'center',
   },
   optionDescription: {
-    fontSize: 15,
+    fontSize: 17,
     color: '#666',
     textAlign: 'center',
-    lineHeight: 22,
+    lineHeight: 24,
   },
   bottomSpacer: {
     flex: 1,

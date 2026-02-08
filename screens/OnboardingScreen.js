@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -11,9 +11,13 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Audio } from 'expo-av';
 import Bubbles from '../components/Bubbles';
+
+const TOTAL_STEPS = 4;
 
 export default function OnboardingScreen({ navigation }) {
   const [step, setStep] = useState(1);
@@ -31,6 +35,12 @@ export default function OnboardingScreen({ navigation }) {
   const [emailInput, setEmailInput] = useState('');
   const [emails, setEmails] = useState([]);
 
+  // Step 4 state - mic test
+  const [micStatus, setMicStatus] = useState('idle'); // idle, recording, done
+  const [recording, setRecording] = useState(null);
+  const [testDuration, setTestDuration] = useState(0);
+  const timerRef = useRef(null);
+
   const handleNext = async () => {
     if (step === 1) {
       if (!name.trim()) {
@@ -41,7 +51,8 @@ export default function OnboardingScreen({ navigation }) {
     } else if (step === 2) {
       setStep(3);
     } else if (step === 3) {
-      // Save all data and navigate to home
+      setStep(4);
+    } else if (step === 4) {
       try {
         await AsyncStorage.setItem('userName', name.trim());
         await AsyncStorage.setItem('userBirthday', birthday.toISOString());
@@ -92,10 +103,48 @@ export default function OnboardingScreen({ navigation }) {
     }
   };
 
-  // Progress bar component
+  // Mic test functions
+  const startMicTest = async () => {
+    try {
+      const permission = await Audio.requestPermissionsAsync();
+      if (!permission.granted) {
+        Alert.alert('Permission needed', 'Please allow microphone access to use Memory Lane.');
+        return;
+      }
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      });
+      const { recording: newRecording } = await Audio.Recording.createAsync(
+        Audio.RecordingOptionsPresets.HIGH_QUALITY
+      );
+      setRecording(newRecording);
+      setMicStatus('recording');
+      setTestDuration(0);
+      timerRef.current = setInterval(() => {
+        setTestDuration((prev) => prev + 1);
+      }, 1000);
+    } catch (err) {
+      console.log('Failed to start recording:', err);
+      Alert.alert('Error', 'Could not access microphone. Please check your settings.');
+    }
+  };
+
+  const stopMicTest = async () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    setMicStatus('done');
+    try {
+      await recording.stopAndUnloadAsync();
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
+    } catch (err) {
+      console.log('Failed to stop recording:', err);
+    }
+    setRecording(null);
+  };
+
   const ProgressBars = () => (
     <View style={styles.progressContainer}>
-      {[1, 2, 3].map((s) => (
+      {Array.from({ length: TOTAL_STEPS }, (_, i) => i + 1).map((s) => (
         <View
           key={s}
           style={[
@@ -106,6 +155,12 @@ export default function OnboardingScreen({ navigation }) {
       ))}
     </View>
   );
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   const renderStep1 = () => (
     <View style={styles.stepContent}>
@@ -230,6 +285,53 @@ export default function OnboardingScreen({ navigation }) {
     </View>
   );
 
+  const renderStep4 = () => (
+    <View style={styles.stepContent}>
+      <Text style={styles.stepTitle}>Test your microphone</Text>
+      <Text style={styles.stepSubtitle}>
+        Memory Lane uses voice recording. Let's make sure your microphone works!
+      </Text>
+
+      <View style={styles.micTestArea}>
+        {micStatus === 'recording' && (
+          <Text style={styles.micRecordingText}>Recording...</Text>
+        )}
+        {micStatus === 'recording' && (
+          <Text style={styles.micTimer}>{formatTime(testDuration)}</Text>
+        )}
+
+        {micStatus === 'idle' && (
+          <TouchableOpacity style={styles.micTestButton} onPress={startMicTest}>
+            <Ionicons name="mic-outline" size={48} color="#1A1A2E" />
+          </TouchableOpacity>
+        )}
+
+        {micStatus === 'recording' && (
+          <TouchableOpacity
+            style={[styles.micTestButton, styles.micTestButtonRecording]}
+            onPress={stopMicTest}
+          >
+            <Ionicons name="stop" size={40} color="#D32F2F" />
+          </TouchableOpacity>
+        )}
+
+        {micStatus === 'done' && (
+          <View style={styles.micDoneArea}>
+            <Ionicons name="checkmark-circle" size={70} color="#4CAF50" />
+            <Text style={styles.micDoneText}>Microphone works!</Text>
+          </View>
+        )}
+
+        {micStatus === 'idle' && (
+          <Text style={styles.micTapText}>Tap to test</Text>
+        )}
+        {micStatus === 'recording' && (
+          <Text style={styles.micTapText}>Tap to stop</Text>
+        )}
+      </View>
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <Bubbles />
@@ -240,7 +342,7 @@ export default function OnboardingScreen({ navigation }) {
       >
         {/* Header with logo and progress */}
         <View style={styles.header}>
-          <Text style={styles.logo}>MemoryLane</Text>
+          <Text style={styles.logo}>Memory Lane</Text>
           <ProgressBars />
         </View>
 
@@ -251,6 +353,7 @@ export default function OnboardingScreen({ navigation }) {
           {step === 1 && renderStep1()}
           {step === 2 && renderStep2()}
           {step === 3 && renderStep3()}
+          {step === 4 && renderStep4()}
         </ScrollView>
 
         {/* Navigation arrows */}
@@ -260,12 +363,12 @@ export default function OnboardingScreen({ navigation }) {
               <Text style={styles.navArrow}>←</Text>
             </TouchableOpacity>
           ) : (
-            <View style={styles.navButton} />
+            <View style={styles.navButtonPlaceholder} />
           )}
 
           <TouchableOpacity style={styles.navButton} onPress={handleNext}>
             <Text style={styles.navArrow}>
-              {step === 3 ? '✓' : '→'}
+              {step === TOTAL_STEPS ? '✓' : '→'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -288,7 +391,7 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   logo: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '400',
     color: '#B0B0B0',
     marginBottom: 16,
@@ -299,8 +402,8 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     flex: 1,
-    height: 4,
-    borderRadius: 2,
+    height: 5,
+    borderRadius: 2.5,
   },
   progressBarActive: {
     backgroundColor: '#1A1A2E',
@@ -317,23 +420,24 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   stepTitle: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: '700',
     color: '#1A1A2E',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   stepSubtitle: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#666',
     marginBottom: 24,
+    lineHeight: 26,
   },
   textInput: {
     borderWidth: 1.5,
     borderColor: '#C0C8D4',
     borderRadius: 12,
     paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 18,
+    paddingVertical: 16,
+    fontSize: 20,
     color: '#1A1A2E',
     backgroundColor: '#fff',
   },
@@ -342,11 +446,11 @@ const styles = StyleSheet.create({
     borderColor: '#C0C8D4',
     borderRadius: 12,
     paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingVertical: 16,
     backgroundColor: '#fff',
   },
   dateButtonText: {
-    fontSize: 18,
+    fontSize: 20,
     color: '#1A1A2E',
   },
   datePicker: {
@@ -359,8 +463,8 @@ const styles = StyleSheet.create({
   },
   addButton: {
     backgroundColor: '#C0E2FE',
-    paddingHorizontal: 20,
-    paddingVertical: 14,
+    paddingHorizontal: 22,
+    paddingVertical: 16,
     borderRadius: 12,
     borderWidth: 1.5,
     borderColor: '#C0C8D4',
@@ -369,7 +473,7 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   addButtonText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
     color: '#1A1A2E',
   },
@@ -383,21 +487,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#C0E2FE',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     borderRadius: 20,
   },
   tagText: {
-    fontSize: 15,
+    fontSize: 17,
     color: '#1A1A2E',
   },
   tagRemove: {
-    fontSize: 15,
+    fontSize: 17,
     color: '#666',
     fontWeight: '600',
   },
   inputLabel: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
     color: '#1A1A2E',
     marginBottom: 10,
@@ -407,14 +511,14 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   addAnotherText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
     color: '#5A8FBF',
   },
   sendButton: {
     marginTop: 30,
     backgroundColor: '#C0E2FE',
-    paddingVertical: 14,
+    paddingVertical: 16,
     paddingHorizontal: 40,
     borderRadius: 30,
     alignSelf: 'center',
@@ -433,9 +537,65 @@ const styles = StyleSheet.create({
     }),
   },
   sendButtonText: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#1A1A2E',
+  },
+  // Step 4 - Mic test
+  micTestArea: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 40,
+  },
+  micTestButton: {
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    backgroundColor: '#C0E2FE',
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 6,
+      },
+    }),
+  },
+  micTestButtonRecording: {
+    backgroundColor: '#FDDEDE',
+  },
+  micRecordingText: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#D32F2F',
+    marginBottom: 6,
+  },
+  micTimer: {
+    fontSize: 32,
+    fontWeight: '300',
+    color: '#1A1A2E',
+    marginBottom: 20,
+    fontVariant: ['tabular-nums'],
+  },
+  micTapText: {
     fontSize: 18,
     fontWeight: '600',
     color: '#1A1A2E',
+    marginTop: 16,
+  },
+  micDoneArea: {
+    alignItems: 'center',
+  },
+  micDoneText: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#4CAF50',
+    marginTop: 12,
   },
   navRow: {
     flexDirection: 'row',
@@ -445,9 +605,9 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
   navButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: '#C0E2FE',
     alignItems: 'center',
     justifyContent: 'center',
@@ -463,8 +623,12 @@ const styles = StyleSheet.create({
       },
     }),
   },
+  navButtonPlaceholder: {
+    width: 56,
+    height: 56,
+  },
   navArrow: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '700',
     color: '#1A1A2E',
   },

@@ -1,16 +1,30 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Platform } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+// Category icon mapping
+const CATEGORY_ICONS = {
+  food: '🍝',
+  family: '❤️',
+  work: '💼',
+  music: '🎵',
+  travel: '✈️',
+  friendship: '🤝',
+  childhood: '🧒',
+  nature: '🌿',
+  holiday: '🎄',
+  school: '📚',
+};
 
 // Generate points along an S-curve
 const generateRoadPoints = (count) => {
   const points = [];
   const centerX = SCREEN_WIDTH / 2;
-  const amplitude = SCREEN_WIDTH * 0.25;
-  const startY = 30;
-  const stepY = 85;
+  const amplitude = SCREEN_WIDTH * 0.18;
+  const startY = 50;
+  const stepY = 130;
 
   for (let i = 0; i < count; i++) {
     const t = i / (count - 1);
@@ -38,14 +52,82 @@ const generateSmoothPath = (points) => {
   return d;
 };
 
+// 3D circle component
+const Circle3D = ({ size, hasMemory, icon, onPress, disabled, style }) => {
+  const baseColor = hasMemory ? '#C5B9E8' : '#E8E2F5';
+  const darkColor = hasMemory ? '#A89BD0' : '#D6CEE8';
+  const lightColor = hasMemory ? '#DDD4F2' : '#F0ECF8';
+
+  return (
+    <TouchableOpacity
+      style={[
+        styles.circleOuter,
+        {
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          ...style,
+        },
+      ]}
+      onPress={onPress}
+      activeOpacity={hasMemory ? 0.7 : 1}
+      disabled={disabled}
+    >
+      {/* Bottom shadow layer */}
+      <View
+        style={[
+          styles.circleShadow,
+          {
+            width: size - 4,
+            height: size - 4,
+            borderRadius: (size - 4) / 2,
+            backgroundColor: darkColor,
+          },
+        ]}
+      />
+      {/* Main body */}
+      <View
+        style={[
+          styles.circleBody,
+          {
+            width: size - 4,
+            height: size - 6,
+            borderRadius: (size - 4) / 2,
+            backgroundColor: baseColor,
+            opacity: hasMemory ? 1 : 0.45,
+          },
+        ]}
+      />
+      {/* Top highlight (3D shine) */}
+      <View
+        style={[
+          styles.circleHighlight,
+          {
+            width: size * 0.55,
+            height: size * 0.35,
+            borderRadius: size * 0.3,
+            backgroundColor: lightColor,
+            top: size * 0.1,
+            left: size * 0.18,
+            opacity: hasMemory ? 0.7 : 0.3,
+          },
+        ]}
+      />
+      {/* Emoji icon */}
+      {hasMemory && (
+        <Text style={styles.circleIcon}>{icon}</Text>
+      )}
+    </TouchableOpacity>
+  );
+};
+
 export default function MemoryRoad({ memories, onCirclePress }) {
   const circleCount = Math.max(memories.length, 8);
   const points = generateRoadPoints(circleCount);
   const pathD = generateSmoothPath(points);
-  const totalHeight = points.length * 85 + 60;
+  const totalHeight = points.length * 130 + 100;
 
-  // Circle sizes - vary them for visual interest
-  const circleSizes = [38, 44, 36, 48, 40, 42, 35, 46, 38, 44];
+  const circleSize = 76;
 
   return (
     <View style={[styles.container, { height: totalHeight }]}>
@@ -60,36 +142,51 @@ export default function MemoryRoad({ memories, onCirclePress }) {
           stroke="#E0D8F0"
           strokeWidth={3}
           fill="none"
-          strokeDasharray="8,6"
+          strokeDasharray="10,8"
           opacity={0.5}
         />
       </Svg>
 
-      {/* Purple circles (stepping stones) */}
+      {/* Purple 3D circles with icons and labels */}
       {points.map((point, index) => {
-        const size = circleSizes[index % circleSizes.length];
         const hasMemory = index < memories.length;
-        const opacity = hasMemory ? 0.55 : 0.25;
+        const memory = hasMemory ? memories[index] : null;
+        const icon = memory ? (CATEGORY_ICONS[memory.category] || '💭') : '';
+        const isLeftOfCenter = point.x < SCREEN_WIDTH / 2;
 
         return (
-          <TouchableOpacity
-            key={index}
-            style={[
-              styles.circle,
-              {
-                width: size,
-                height: size,
-                borderRadius: size / 2,
-                left: point.x - size / 2,
-                top: point.y - size / 2,
-                opacity,
-                backgroundColor: hasMemory ? '#C5B9E8' : '#DDD6EE',
-              },
-            ]}
-            onPress={() => hasMemory && onCirclePress(memories[index], index)}
-            activeOpacity={hasMemory ? 0.6 : 1}
-            disabled={!hasMemory}
-          />
+          <View key={index}>
+            <Circle3D
+              size={circleSize}
+              hasMemory={hasMemory}
+              icon={icon}
+              onPress={() => hasMemory && onCirclePress(memory, index)}
+              disabled={!hasMemory}
+              style={{
+                left: point.x - circleSize / 2,
+                top: point.y - circleSize / 2,
+              }}
+            />
+
+            {/* Label next to circle - single line, kept away from edges */}
+            {hasMemory && memory.label && (
+              <View
+                style={[
+                  styles.labelContainer,
+                  {
+                    top: point.y - 12,
+                    ...(isLeftOfCenter
+                      ? { left: Math.min(point.x + circleSize / 2 + 14, SCREEN_WIDTH - 160) }
+                      : { left: Math.max(20, point.x - circleSize / 2 - 160) }),
+                  },
+                ]}
+              >
+                <Text style={styles.labelText} numberOfLines={1}>
+                  {memory.label}
+                </Text>
+              </View>
+            )}
+          </View>
         );
       })}
     </View>
@@ -101,7 +198,43 @@ const styles = StyleSheet.create({
     width: SCREEN_WIDTH,
     position: 'relative',
   },
-  circle: {
+  circleOuter: {
     position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#8B7FC7',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.35,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 6,
+      },
+    }),
+  },
+  circleShadow: {
+    position: 'absolute',
+    bottom: 0,
+  },
+  circleBody: {
+    position: 'absolute',
+    top: 0,
+  },
+  circleHighlight: {
+    position: 'absolute',
+  },
+  circleIcon: {
+    fontSize: 30,
+    zIndex: 1,
+  },
+  labelContainer: {
+    position: 'absolute',
+  },
+  labelText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#444',
   },
 });

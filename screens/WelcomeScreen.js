@@ -12,7 +12,7 @@ import Bubbles from '../components/Bubbles';
 export default function WelcomeScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
-      <Bubbles />
+      <Bubbles animated />
 
       <View style={styles.content}>
         {/* Title pushed toward upper portion */}
@@ -60,41 +60,41 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
   },
   topSpacer: {
-    flex: 0.55,
+    flex: 0.35,
   },
   textBlock: {
     alignItems: 'center',
   },
   welcomeText: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: '300',
     color: '#1A1A2E',
     marginBottom: 4,
   },
   appName: {
-    fontSize: 38,
+    fontSize: 44,
     fontWeight: '700',
     color: '#1A1A2E',
   },
   middleSpacer: {
-    flex: 0.5,
+    flex: 0.55,
   },
   subtitleBlock: {
     alignItems: 'center',
   },
   subtitle: {
-    fontSize: 22,
+    fontSize: 26,
     fontWeight: '600',
     color: '#1A1A2E',
     textAlign: 'center',
-    lineHeight: 32,
+    lineHeight: 38,
   },
   buttonSpacer: {
-    flex: 0.3,
+    flex: 0.35,
   },
   button: {
-    paddingVertical: 14,
-    paddingHorizontal: 50,
+    paddingVertical: 16,
+    paddingHorizontal: 55,
     borderRadius: 30,
     borderWidth: 1.5,
     borderColor: '#C0C8D4',
@@ -112,11 +112,11 @@ const styles = StyleSheet.create({
     }),
   },
   buttonText: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '600',
     color: '#1A1A2E',
   },
   bottomSpacer: {
-    flex: 0.6,
+    flex: 0.5,
   },
 });

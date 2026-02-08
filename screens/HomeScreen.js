@@ -25,7 +25,7 @@ const DAILY_PROMPTS = [
   'Tell me about a place that felt like home.',
 ];
 
-// Mock past memories for the road map
+// Mock past memories with categories and labels
 const MOCK_MEMORIES = [
   {
     id: 1,
@@ -34,6 +34,8 @@ const MOCK_MEMORIES = [
     summary:
       'Shared a warm memory about hearing "Moon River" on the radio while driving with their father on Sunday mornings. The song still brings a sense of peace and nostalgia.',
     hasRecording: true,
+    category: 'music',
+    label: 'Sunday Drives',
   },
   {
     id: 2,
@@ -42,6 +44,8 @@ const MOCK_MEMORIES = [
     summary:
       'Talked about childhood friend Eddie who lived next door. They built a treehouse together and stayed friends through high school. Lost touch after college but still thinks of him.',
     hasRecording: true,
+    category: 'friendship',
+    label: 'Childhood Friend',
   },
   {
     id: 3,
@@ -50,6 +54,8 @@ const MOCK_MEMORIES = [
     summary:
       'Recalled making tamales with the whole family every Christmas Eve. Grandmother would lead the kitchen and everyone had a role. The smell of masa still brings comfort.',
     hasRecording: true,
+    category: 'holiday',
+    label: 'Christmas Eve',
   },
   {
     id: 4,
@@ -58,6 +64,8 @@ const MOCK_MEMORIES = [
     summary:
       'First job was at a local bakery at age 15. Loved waking up early to the smell of fresh bread. The owner taught the value of showing up and doing your best.',
     hasRecording: true,
+    category: 'work',
+    label: 'First Job',
   },
   {
     id: 5,
@@ -66,6 +74,28 @@ const MOCK_MEMORIES = [
     summary:
       'Summer smelled like fresh-cut grass, barbecue smoke from neighbors, and honeysuckle along the fence. Kids played outside until the streetlights came on.',
     hasRecording: true,
+    category: 'nature',
+    label: 'Summer Days',
+  },
+  {
+    id: 6,
+    date: 'February 1, 2026',
+    prompt: 'What was your favourite meal your mother made?',
+    summary:
+      'Mom\'s chicken soup was legendary in the family. She made it every Sunday and the whole house would smell amazing. The secret was fresh dill from the garden.',
+    hasRecording: true,
+    category: 'food',
+    label: "Mom's Cooking",
+  },
+  {
+    id: 7,
+    date: 'January 31, 2026',
+    prompt: 'Tell me about a place that felt like home.',
+    summary:
+      'Grandparents\' farmhouse upstate was the safest place in the world. Spent every summer there. The porch swing, the fireflies, and grandma\'s lemonade made it magical.',
+    hasRecording: true,
+    category: 'family',
+    label: 'Grandma\'s House',
   },
 ];
 
@@ -123,7 +153,7 @@ export default function HomeScreen({ navigation }) {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.logo}>MemoryLane</Text>
+          <Text style={styles.logo}>Memory Lane</Text>
           <Text style={styles.greeting}>
             {getGreeting()}, {userName || 'Friend'}
           </Text>
@@ -177,22 +207,23 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   logo: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '400',
     color: '#B0B0B0',
     marginBottom: 4,
   },
   greeting: {
-    fontSize: 26,
+    fontSize: 30,
     fontWeight: '700',
     color: '#1A1A2E',
     textDecorationLine: 'underline',
     textDecorationColor: '#A8C8E8',
-    marginBottom: 2,
+    marginBottom: 4,
   },
   date: {
-    fontSize: 15,
-    color: '#666',
+    fontSize: 19,
+    fontWeight: '700',
+    color: '#2A2A3E',
   },
   promptCard: {
     marginHorizontal: 20,
@@ -201,7 +232,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1.5,
     borderColor: '#C8D4E4',
-    padding: 20,
+    padding: 22,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
@@ -215,23 +246,23 @@ const styles = StyleSheet.create({
     }),
   },
   promptLabel: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '700',
     color: '#1A1A2E',
     letterSpacing: 0.5,
     marginBottom: 12,
   },
   promptText: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '500',
     color: '#1A1A2E',
-    lineHeight: 30,
+    lineHeight: 32,
     marginBottom: 18,
   },
   recordButton: {
     backgroundColor: '#C0E2FE',
-    paddingVertical: 12,
-    paddingHorizontal: 30,
+    paddingVertical: 14,
+    paddingHorizontal: 32,
     borderRadius: 25,
     alignSelf: 'flex-start',
     borderWidth: 1.5,
@@ -249,7 +280,7 @@ const styles = StyleSheet.create({
     }),
   },
   recordButtonText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
     color: '#1A1A2E',
   },

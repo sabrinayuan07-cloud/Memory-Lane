@@ -31,7 +31,7 @@ function MainTabs() {
           } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person-outline';
           }
-          return <Ionicons name={iconName} size={size} color={color} />;
+          return <Ionicons name={iconName} size={28} color={color} />;
         },
         tabBarActiveTintColor: '#1A1A2E',
         tabBarInactiveTintColor: '#999',
@@ -39,13 +39,13 @@ function MainTabs() {
           backgroundColor: '#F5F5F5',
           borderTopWidth: 1,
           borderTopColor: '#E0E0E0',
-          paddingBottom: 5,
-          paddingTop: 5,
-          height: 60,
+          paddingBottom: 30,
+          paddingTop: 12,
+          height: 95,
         },
         tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: '500',
+          fontSize: 13,
+          fontWeight: '600',
         },
       })}
     >
