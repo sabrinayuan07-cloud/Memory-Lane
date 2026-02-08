@@ -52,11 +52,16 @@ const generateSmoothPath = (points) => {
   return d;
 };
 
+// Color palettes
+const EMPTY_BLUE = { base: '#B8D4E3', dark: '#9BBDD1', light: '#D6E8F0' };
+const EMPTY_GREEN = { base: '#B8D4B1', dark: '#A0C49D', light: '#D0E4CD' };
+
 // 3D circle component - supports blue (senior) and green (family) colors
-const Circle3D = ({ size, hasMemory, isFamily, icon, onPress, disabled, style }) => {
+const Circle3D = ({ size, hasMemory, isFamily, emptyPalette, icon, onPress, disabled, style }) => {
   let baseColor, darkColor, lightColor;
   if (!hasMemory) {
-    baseColor = '#B8D4E3'; darkColor = '#9BBDD1'; lightColor = '#D6E8F0';
+    const palette = emptyPalette || EMPTY_BLUE;
+    baseColor = palette.base; darkColor = palette.dark; lightColor = palette.light;
   } else if (isFamily) {
     baseColor = '#5A7A5C'; darkColor = '#4A6A4C'; lightColor = '#7A9A7C';
   } else {
@@ -126,7 +131,8 @@ const Circle3D = ({ size, hasMemory, isFamily, icon, onPress, disabled, style })
   );
 };
 
-export default function MemoryRoad({ memories, onCirclePress }) {
+export default function MemoryRoad({ memories, onCirclePress, theme }) {
+  const isGreenTheme = theme === 'family';
   const circleCount = Math.max(memories.length, 8);
   const points = generateRoadPoints(circleCount);
   const pathD = generateSmoothPath(points);
@@ -144,7 +150,7 @@ export default function MemoryRoad({ memories, onCirclePress }) {
       >
         <Path
           d={pathD}
-          stroke="#B8D4E3"
+          stroke={isGreenTheme ? '#B8D4B1' : '#B8D4E3'}
           strokeWidth={3}
           fill="none"
           strokeDasharray="10,8"
@@ -164,7 +170,8 @@ export default function MemoryRoad({ memories, onCirclePress }) {
             <Circle3D
               size={circleSize}
               hasMemory={hasMemory}
-              isFamily={hasMemory && memory.addedByFamily}
+              isFamily={isGreenTheme || (hasMemory && memory?.addedByFamily)}
+              emptyPalette={isGreenTheme ? EMPTY_GREEN : EMPTY_BLUE}
               icon={icon}
               onPress={() => hasMemory && onCirclePress(memory, index)}
               disabled={!hasMemory}

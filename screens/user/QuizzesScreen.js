@@ -12,6 +12,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Bubbles from '../../components/Bubbles';
+import { speakText, stopSpeaking } from '../../utils/elevenLabsTTS';
 
 const ERA_QUESTIONS = {
     '1940s': [
@@ -222,6 +223,7 @@ export default function QuizzesScreen() {
     const [questionsAnswered, setQuestionsAnswered] = useState(0);
     const [popQuestions, setPopQuestions] = useState(ERA_QUESTIONS.default);
     const [memoryQuestions, setMemoryQuestions] = useState([]);
+    const [isSpeaking, setIsSpeaking] = useState(false);
     const quizStartTime = useRef(Date.now());
 
     useEffect(() => {
@@ -256,7 +258,25 @@ export default function QuizzesScreen() {
         ])
         : popQuestions;
 
+    const handleSpeakQuestion = async () => {
+        if (isSpeaking) {
+            await stopSpeaking();
+            setIsSpeaking(false);
+        } else {
+            const q = questions[currentQ];
+            const optionsText = q.options.map((o, i) => `Option ${i + 1}: ${o}`).join('. ');
+            const fullText = `${q.question} ${optionsText}`;
+            setIsSpeaking(true);
+            const success = await speakText(fullText, () => {
+                setIsSpeaking(false);
+            });
+            if (!success) setIsSpeaking(false);
+        }
+    };
+
     const startQuiz = (type) => {
+        stopSpeaking();
+        setIsSpeaking(false);
         setQuizType(type);
         setCurrentQ(0);
         setQuestionsAnswered(0);
@@ -265,6 +285,8 @@ export default function QuizzesScreen() {
     };
 
     const handleAnswer = () => {
+        stopSpeaking();
+        setIsSpeaking(false);
         setAffirmation(getRandomAffirmation());
         setShowFeedback(true);
         setQuestionsAnswered((p) => p + 1);
@@ -322,7 +344,7 @@ export default function QuizzesScreen() {
             <ScrollView contentContainerStyle={styles.quizScroll} showsVerticalScrollIndicator={false}>
                 {/* Progress */}
                 <View style={styles.quizHeader}>
-                    <TouchableOpacity onPress={() => setView('categories')}>
+                    <TouchableOpacity onPress={() => { stopSpeaking(); setIsSpeaking(false); setView('categories'); }}>
                         <Ionicons name="arrow-back" size={34} color="#1A1A2E" />
                     </TouchableOpacity>
                     <Text style={styles.quizProgress}>
@@ -344,7 +366,16 @@ export default function QuizzesScreen() {
                         {q.photo && (
                             <Image source={{ uri: q.photo }} style={styles.quizPhoto} />
                         )}
-                        <Text style={styles.questionText}>{q.question}</Text>
+                        <View style={styles.questionRow}>
+                            <Text style={styles.questionText}>{q.question}</Text>
+                            <TouchableOpacity onPress={handleSpeakQuestion} activeOpacity={0.6} style={styles.volumeButton}>
+                                <Ionicons
+                                    name={isSpeaking ? 'volume-high' : 'volume-high-outline'}
+                                    size={26}
+                                    color={isSpeaking ? '#2A6F97' : '#1A1A2E'}
+                                />
+                            </TouchableOpacity>
+                        </View>
                         <View style={styles.optionsArea}>
                             {q.options.map((option, i) => (
                                 <TouchableOpacity
@@ -429,7 +460,9 @@ const styles = StyleSheet.create({
     quizPhoto: {
         width: '100%', height: 220, borderRadius: 18, marginBottom: 24,
     },
-    questionText: { fontSize: 27, fontWeight: '700', color: '#1A1A2E', lineHeight: 38, marginBottom: 30 },
+    questionRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, marginBottom: 30 },
+    questionText: { fontSize: 27, fontWeight: '700', color: '#1A1A2E', lineHeight: 38, flex: 1 },
+    volumeButton: { paddingTop: 6, padding: 6 },
     optionsArea: { gap: 16 },
     optionBtn: {
         backgroundColor: '#C0E2FE', paddingVertical: 18, paddingHorizontal: 24,

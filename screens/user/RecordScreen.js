@@ -15,6 +15,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Audio } from 'expo-av';
 import * as ImagePicker from 'expo-image-picker';
 import Bubbles from '../../components/Bubbles';
+import { generateMemorySummary } from '../../utils/geminiSummary';
+import { speakText, stopSpeaking } from '../../utils/elevenLabsTTS';
 
 const DAILY_PROMPTS = [
     'What was your favourite meal your mother made?',
@@ -78,6 +80,7 @@ export default function RecordScreen() {
     const [elapsedTime, setElapsedTime] = useState(0);
     const [photos, setPhotos] = useState([]);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [isSpeaking, setIsSpeaking] = useState(false);
 
     const timerRef = useRef(null);
     const recordingRef = useRef(null);
@@ -259,6 +262,27 @@ export default function RecordScreen() {
             memories.unshift(newMemory);
             await AsyncStorage.setItem('memories', JSON.stringify(memories));
 
+            // Generate AI summary from recording (async, non-blocking)
+            if (recordingUriRef.current) {
+                generateMemorySummary(recordingUriRef.current, prompt)
+                    .then(async (aiSummary) => {
+                        if (aiSummary) {
+                            try {
+                                const updated = await AsyncStorage.getItem('memories');
+                                const memList = updated ? JSON.parse(updated) : [];
+                                const idx = memList.findIndex((m) => m.id === newMemory.id);
+                                if (idx !== -1) {
+                                    memList[idx].summary = aiSummary;
+                                    await AsyncStorage.setItem('memories', JSON.stringify(memList));
+                                }
+                            } catch (e) {
+                                console.log('Error saving AI summary:', e);
+                            }
+                        }
+                    })
+                    .catch(() => {});
+            }
+
             // Update streak
             const streakData = await AsyncStorage.getItem('streakData');
             const streak = streakData ? JSON.parse(streakData) : { current: 0, lastDate: '' };
@@ -312,6 +336,19 @@ export default function RecordScreen() {
 
     const removePhoto = (index) => {
         setPhotos((prev) => prev.filter((_, i) => i !== index));
+    };
+
+    const handleSpeakPrompt = async () => {
+        if (isSpeaking) {
+            await stopSpeaking();
+            setIsSpeaking(false);
+        } else {
+            setIsSpeaking(true);
+            const success = await speakText(getDailyPrompt(), () => {
+                setIsSpeaking(false);
+            });
+            if (!success) setIsSpeaking(false);
+        }
     };
 
     // --- RENDER SECTIONS ---
@@ -438,7 +475,16 @@ export default function RecordScreen() {
                         </View>
 
                         <View style={styles.promptCard}>
-                            <Text style={styles.promptLabel}>Today's Memory Prompt</Text>
+                            <View style={styles.promptLabelRow}>
+                                <Text style={styles.promptLabel}>Today's Memory Prompt</Text>
+                                <TouchableOpacity onPress={handleSpeakPrompt} activeOpacity={0.6} style={styles.volumeButton}>
+                                    <Ionicons
+                                        name={isSpeaking ? 'volume-high' : 'volume-high-outline'}
+                                        size={26}
+                                        color={isSpeaking ? '#2A6F97' : '#1A1A2E'}
+                                    />
+                                </TouchableOpacity>
+                            </View>
                             <Text style={styles.promptText}>"{getDailyPrompt()}"</Text>
                         </View>
                     </>
@@ -468,7 +514,9 @@ const styles = StyleSheet.create({
             android: { elevation: 3 },
         }),
     },
-    promptLabel: { fontSize: 19, fontWeight: '600', color: '#4A7A99', marginBottom: 16 },
+    promptLabelRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 },
+    promptLabel: { fontSize: 19, fontWeight: '600', color: '#4A7A99' },
+    volumeButton: { padding: 6 },
     promptText: {
         fontSize: 25, fontWeight: '700', color: '#1A1A2E', lineHeight: 36,
     },

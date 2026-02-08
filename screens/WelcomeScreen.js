@@ -3,11 +3,11 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   SafeAreaView,
   Platform,
 } from 'react-native';
 import Bubbles from '../components/Bubbles';
+import AnimatedButton from '../components/AnimatedButton';
 
 export default function WelcomeScreen({ navigation }) {
   return (
@@ -35,13 +35,12 @@ export default function WelcomeScreen({ navigation }) {
         {/* Space between subtitle and button */}
         <View style={styles.buttonSpacer} />
 
-        <TouchableOpacity
+        <AnimatedButton
           style={styles.button}
           onPress={() => navigation.navigate('UserSelection')}
-          activeOpacity={0.7}
         >
           <Text style={styles.buttonText}>Get Started</Text>
-        </TouchableOpacity>
+        </AnimatedButton>
 
         <View style={styles.bottomSpacer} />
       </View>
@@ -96,8 +95,8 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 55,
     borderRadius: 30,
-    borderWidth: 1.5,
-    borderColor: '#C0C8D4',
+    borderWidth: 2,
+    borderColor: '#1A1A2E',
     backgroundColor: '#C0E2FE',
     ...Platform.select({
       ios: {

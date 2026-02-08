@@ -8,10 +8,12 @@ import {
     SafeAreaView,
     Platform,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import MemoryRoad from '../../components/MemoryRoad';
 import MemoryPopup from '../../components/MemoryPopup';
+import { speakText, stopSpeaking } from '../../utils/elevenLabsTTS';
 
 const DAILY_PROMPTS = [
     'What was your favourite meal your mother made?',
@@ -54,6 +56,7 @@ export default function HomeScreen({ navigation }) {
     const [memories, setMemories] = useState([]);
     const [selectedMemory, setSelectedMemory] = useState(null);
     const [popupVisible, setPopupVisible] = useState(false);
+    const [isSpeaking, setIsSpeaking] = useState(false);
 
     useFocusEffect(
         useCallback(() => {
@@ -72,6 +75,19 @@ export default function HomeScreen({ navigation }) {
             loadData();
         }, [])
     );
+
+    const handleSpeakPrompt = async () => {
+        if (isSpeaking) {
+            await stopSpeaking();
+            setIsSpeaking(false);
+        } else {
+            setIsSpeaking(true);
+            const success = await speakText(getDailyPrompt(), () => {
+                setIsSpeaking(false);
+            });
+            if (!success) setIsSpeaking(false);
+        }
+    };
 
     const handleCirclePress = (memory) => {
         setSelectedMemory(memory);
@@ -96,7 +112,16 @@ export default function HomeScreen({ navigation }) {
 
                 {/* Today's Memory Prompt */}
                 <View style={styles.promptCard}>
-                    <Text style={styles.promptLabel}>TODAY'S MEMORY PROMPT</Text>
+                    <View style={styles.promptLabelRow}>
+                        <Text style={styles.promptLabel}>TODAY'S MEMORY PROMPT</Text>
+                        <TouchableOpacity onPress={handleSpeakPrompt} activeOpacity={0.6} style={styles.volumeButton}>
+                            <Ionicons
+                                name={isSpeaking ? 'volume-high' : 'volume-high-outline'}
+                                size={26}
+                                color={isSpeaking ? '#2A6F97' : '#1A1A2E'}
+                            />
+                        </TouchableOpacity>
+                    </View>
                     <Text style={styles.promptText}>"{getDailyPrompt()}"</Text>
                     <TouchableOpacity
                         style={styles.recordButton}
@@ -177,12 +202,20 @@ const styles = StyleSheet.create({
             },
         }),
     },
+    promptLabelRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 14,
+    },
     promptLabel: {
         fontSize: 15,
         fontWeight: '700',
         color: '#1A1A2E',
         letterSpacing: 0.5,
-        marginBottom: 14,
+    },
+    volumeButton: {
+        padding: 6,
     },
     promptText: {
         fontSize: 23,

@@ -397,12 +397,14 @@ export default function OnboardingScreen({ navigation }) {
 
                 {/* Navigation arrows */}
                 <View style={styles.navRow}>
-                    {step > 1 ? (
-                        <TouchableOpacity style={styles.navButton} onPress={handleBack}>
+                    {step === 1 ? (
+                        <TouchableOpacity style={styles.navButton} onPress={() => navigation.goBack()}>
                             <Text style={styles.navArrow}>←</Text>
                         </TouchableOpacity>
                     ) : (
-                        <View style={styles.navButtonPlaceholder} />
+                        <TouchableOpacity style={styles.navButton} onPress={handleBack}>
+                            <Text style={styles.navArrow}>←</Text>
+                        </TouchableOpacity>
                     )}
 
                     <TouchableOpacity style={styles.navButton} onPress={handleNext}>

@@ -76,6 +76,7 @@ export default function HomeScreen({ navigation }) {
                 <MemoryRoad
                     memories={memories}
                     onCirclePress={handleCirclePress}
+                    theme="family"
                 />
             </ScrollView>
 

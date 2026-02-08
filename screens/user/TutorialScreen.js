@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Bubbles from '../../components/Bubbles';
+import { speakText, stopSpeaking } from '../../utils/elevenLabsTTS';
 
 const TUTORIAL_PAGES = [
     {
@@ -35,10 +36,13 @@ const TUTORIAL_PAGES = [
 
 export default function TutorialScreen({ navigation }) {
     const [page, setPage] = useState(0);
+    const [isSpeaking, setIsSpeaking] = useState(false);
 
     const current = TUTORIAL_PAGES[page];
 
     const handleNext = () => {
+        stopSpeaking();
+        setIsSpeaking(false);
         if (page < TUTORIAL_PAGES.length - 1) {
             setPage(page + 1);
         } else {
@@ -47,7 +51,25 @@ export default function TutorialScreen({ navigation }) {
     };
 
     const handleBack = () => {
-        if (page > 0) setPage(page - 1);
+        if (page > 0) {
+            stopSpeaking();
+            setIsSpeaking(false);
+            setPage(page - 1);
+        }
+    };
+
+    const handleSpeakTutorial = async () => {
+        if (isSpeaking) {
+            await stopSpeaking();
+            setIsSpeaking(false);
+        } else {
+            setIsSpeaking(true);
+            const textToRead = `${current.title}. ${current.description.replace(/\n/g, ' ')}`;
+            const success = await speakText(textToRead, () => {
+                setIsSpeaking(false);
+            });
+            if (!success) setIsSpeaking(false);
+        }
     };
 
     return (
@@ -78,6 +100,22 @@ export default function TutorialScreen({ navigation }) {
 
                     {/* Description */}
                     <Text style={styles.description}>{current.description}</Text>
+
+                    {/* Listen button */}
+                    <TouchableOpacity
+                        style={styles.listenButton}
+                        onPress={handleSpeakTutorial}
+                        activeOpacity={0.6}
+                    >
+                        <Ionicons
+                            name={isSpeaking ? 'volume-high' : 'volume-high-outline'}
+                            size={28}
+                            color={isSpeaking ? '#2A6F97' : '#1A1A2E'}
+                        />
+                        <Text style={styles.listenText}>
+                            {isSpeaking ? 'Playing...' : 'Listen'}
+                        </Text>
+                    </TouchableOpacity>
                 </View>
 
                 {/* Navigation arrows */}
@@ -173,6 +211,32 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         lineHeight: 34,
         paddingHorizontal: 10,
+    },
+    listenButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        marginTop: 28,
+        backgroundColor: '#E8F0F8',
+        paddingVertical: 14,
+        paddingHorizontal: 24,
+        borderRadius: 30,
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 4,
+            },
+            android: {
+                elevation: 3,
+            },
+        }),
+    },
+    listenText: {
+        fontSize: 20,
+        fontWeight: '600',
+        color: '#1A1A2E',
     },
     navRow: {
         flexDirection: 'row',

@@ -93,7 +93,7 @@ function FamilyTabs() {
                     } else if (route.name === 'Updates') {
                         iconName = focused ? 'person' : 'person-outline';
                     }
-                    return <Ionicons name={iconName} size={30} color={color} />;
+                    return <Ionicons name={iconName} size={34} color={color} />;
                 },
                 tabBarActiveTintColor: '#1A1A2E',
                 tabBarInactiveTintColor: '#595959',

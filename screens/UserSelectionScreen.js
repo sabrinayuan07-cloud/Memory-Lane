@@ -10,6 +10,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Bubbles from '../components/Bubbles';
+import AnimatedButton from '../components/AnimatedButton';
 
 export default function UserSelectionScreen({ navigation }) {
   const handleSelection = async (userType) => {
@@ -56,15 +57,14 @@ export default function UserSelectionScreen({ navigation }) {
         <View style={styles.optionsContainer}>
           {/* Option 1: For myself */}
           <View style={styles.optionBlock}>
-            <TouchableOpacity
+            <AnimatedButton
               style={styles.optionButton}
               onPress={() => handleSelection('self')}
-              activeOpacity={0.7}
             >
               <Text style={styles.optionButtonText}>
                 I'm using this for myself
               </Text>
-            </TouchableOpacity>
+            </AnimatedButton>
             <Text style={styles.optionDescription}>
               For personal memory keeping{'\n'}and reflection
             </Text>
@@ -72,15 +72,14 @@ export default function UserSelectionScreen({ navigation }) {
 
           {/* Option 2: Helping a loved one */}
           <View style={styles.optionBlock}>
-            <TouchableOpacity
+            <AnimatedButton
               style={styles.optionButton}
               onPress={() => handleSelection('caregiver')}
-              activeOpacity={0.7}
             >
               <Text style={styles.optionButtonText}>
                 I'm helping a loved one
               </Text>
-            </TouchableOpacity>
+            </AnimatedButton>
             <Text style={styles.optionDescription}>
               For family members or caregivers
             </Text>
@@ -135,8 +134,8 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 35,
     borderRadius: 30,
-    borderWidth: 1.5,
-    borderColor: '#C0C8D4',
+    borderWidth: 2,
+    borderColor: '#1A1A2E',
     backgroundColor: '#C0E2FE',
     marginBottom: 10,
     ...Platform.select({
