@@ -7,17 +7,23 @@ import { Ionicons } from '@expo/vector-icons';
 import WelcomeScreen from './screens/WelcomeScreen';
 import UserSelectionScreen from './screens/UserSelectionScreen';
 
+// User/Senior screens
 import OnboardingScreen from './screens/user/OnboardingScreen';
 import HomeScreen from './screens/user/HomeScreen';
 import RecordScreen from './screens/user/RecordScreen';
 import QuizzesScreen from './screens/user/QuizzesScreen';
-import FamilyOnboarding from './screens/family/OnBoarding';
 import ProfileScreen from './screens/user/ProfileScreen';
 
+// Family screens
+import FamilyOnboarding from './screens/family/OnBoarding';
+import FamilyHomeScreen from './screens/family/HomeScreen';
+import FamilyRecordScreen from './screens/family/RecordScreen';
+import FamilyProfileScreen from './screens/family/ProfileScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
+// Senior/User Tabs (Blue theme)
 function MainTabs() {
     return (
         <Tab.Navigator
@@ -60,6 +66,58 @@ function MainTabs() {
     );
 }
 
+// Family Tabs (Green theme)
+function FamilyTabs() {
+    return (
+        <Tab.Navigator
+            screenOptions={({ route }) => ({
+                headerShown: false,
+                tabBarIcon: ({ focused, color, size }) => {
+                    let iconName;
+                    if (route.name === 'FamilyHome') {
+                        iconName = focused ? 'home' : 'home-outline';
+                    } else if (route.name === 'AddMemory') {
+                        iconName = focused ? 'add-circle' : 'add-circle-outline';
+                    } else if (route.name === 'Updates') {
+                        iconName = focused ? 'person' : 'person-outline';
+                    }
+                    return <Ionicons name={iconName} size={34} color={color} />;
+                },
+                tabBarActiveTintColor: '#1A1A2E',
+                tabBarInactiveTintColor: '#595959',
+                tabBarStyle: {
+                    backgroundColor: '#F5F5F5',
+                    borderTopWidth: 1,
+                    borderTopColor: '#E0E0E0',
+                    paddingBottom: 30,
+                    paddingTop: 14,
+                    height: 105,
+                },
+                tabBarLabelStyle: {
+                    fontSize: 15,
+                    fontWeight: '700',
+                },
+            })}
+        >
+            <Tab.Screen 
+                name="FamilyHome" 
+                component={FamilyHomeScreen}
+                options={{ tabBarLabel: 'Home' }}
+            />
+            <Tab.Screen 
+                name="AddMemory" 
+                component={FamilyRecordScreen}
+                options={{ tabBarLabel: 'Add Memory' }}
+            />
+            <Tab.Screen 
+                name="Updates" 
+                component={FamilyProfileScreen}
+                options={{ tabBarLabel: 'Updates' }}
+            />
+        </Tab.Navigator>
+    );
+}
+
 export default function App() {
     return (
         <NavigationContainer>
@@ -74,6 +132,11 @@ export default function App() {
                 <Stack.Screen
                     name="MainTabs"
                     component={MainTabs}
+                    options={{ gestureEnabled: false }}
+                />
+                <Stack.Screen
+                    name="FamilyHome"
+                    component={FamilyTabs}
                     options={{ gestureEnabled: false }}
                 />
             </Stack.Navigator>
