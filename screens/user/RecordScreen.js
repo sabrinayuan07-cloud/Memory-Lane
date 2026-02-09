@@ -17,32 +17,7 @@ import * as ImagePicker from 'expo-image-picker';
 import Bubbles from '../../components/Bubbles';
 import { generateMemorySummary } from '../../utils/geminiSummary';
 import { speakText, stopSpeaking } from '../../utils/elevenLabsTTS';
-
-const DAILY_PROMPTS = [
-    'What was your favourite meal your mother made?',
-    'Tell me about the first time you fell in love.',
-    'What did your neighborhood smell like in summer?',
-    'What was your proudest moment at work?',
-    'Who was your best friend growing up?',
-    'What was your favorite game to play as a child?',
-    'Describe a holiday tradition from your childhood.',
-    'What was the first job you ever had?',
-    'What song brings back the strongest memory?',
-    'Tell me about a place that felt like home.',
-];
-
-const PROMPT_CATEGORIES = {
-    'What was your favourite meal your mother made?': { category: 'food', label: "Mom's Cooking" },
-    'Tell me about the first time you fell in love.': { category: 'family', label: 'First Love' },
-    'What did your neighborhood smell like in summer?': { category: 'nature', label: 'Summer Days' },
-    'What was your proudest moment at work?': { category: 'work', label: 'Proudest Moment' },
-    'Who was your best friend growing up?': { category: 'friendship', label: 'Childhood Friend' },
-    'What was your favorite game to play as a child?': { category: 'childhood', label: 'Childhood Games' },
-    'Describe a holiday tradition from your childhood.': { category: 'holiday', label: 'Holiday Tradition' },
-    'What was the first job you ever had?': { category: 'work', label: 'First Job' },
-    'What song brings back the strongest memory?': { category: 'music', label: 'A Special Song' },
-    'Tell me about a place that felt like home.': { category: 'family', label: 'Feeling of Home' },
-};
+import { getDailyPrompt } from '../../utils/geminiPrompts';
 
 const getGreeting = () => {
     const hour = new Date().getHours();
@@ -60,13 +35,6 @@ const getFormattedDate = () => {
     });
 };
 
-const getDailyPrompt = () => {
-    const dayOfYear = Math.floor(
-        (Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000
-    );
-    return DAILY_PROMPTS[dayOfYear % DAILY_PROMPTS.length];
-};
-
 const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -81,6 +49,7 @@ export default function RecordScreen() {
     const [photos, setPhotos] = useState([]);
     const [isPlaying, setIsPlaying] = useState(false);
     const [isSpeaking, setIsSpeaking] = useState(false);
+    const [dailyPrompt, setDailyPrompt] = useState({ prompt: '', category: 'childhood', label: 'A Memory' });
 
     const timerRef = useRef(null);
     const recordingRef = useRef(null);
@@ -89,15 +58,17 @@ export default function RecordScreen() {
     const screenOpenTime = useRef(Date.now());
 
     useEffect(() => {
-        const loadName = async () => {
+        const loadData = async () => {
             try {
                 const name = await AsyncStorage.getItem('userName');
                 if (name) setUserName(name);
+                const prompt = await getDailyPrompt();
+                setDailyPrompt(prompt);
             } catch (e) {
-                console.log('Error loading name:', e);
+                console.log('Error loading data:', e);
             }
         };
-        loadName();
+        loadData();
         screenOpenTime.current = Date.now();
         return () => {
             if (timerRef.current) clearInterval(timerRef.current);
@@ -238,8 +209,7 @@ export default function RecordScreen() {
                 (m) => new Date(m.dateISO || m.date).toDateString() !== today
             );
 
-            const prompt = getDailyPrompt();
-            const promptInfo = PROMPT_CATEGORIES[prompt] || { category: 'childhood', label: 'A Memory' };
+            const prompt = dailyPrompt.prompt;
             const now = new Date();
 
             const newMemory = {
@@ -251,9 +221,9 @@ export default function RecordScreen() {
                     year: 'numeric',
                 }),
                 prompt: prompt,
-                category: promptInfo.category,
-                label: promptInfo.label,
-                summary: `Shared a memory about "${promptInfo.label}" in response to today's prompt.`,
+                category: dailyPrompt.category,
+                label: dailyPrompt.label,
+                summary: `Shared a memory about "${dailyPrompt.label}" in response to today's prompt.`,
                 hasRecording: !!recordingUriRef.current,
                 recordingUri: recordingUriRef.current,
                 photos: photos,
@@ -344,7 +314,7 @@ export default function RecordScreen() {
             setIsSpeaking(false);
         } else {
             setIsSpeaking(true);
-            const success = await speakText(getDailyPrompt(), () => {
+            const success = await speakText(dailyPrompt.prompt, () => {
                 setIsSpeaking(false);
             });
             if (!success) setIsSpeaking(false);
@@ -485,7 +455,7 @@ export default function RecordScreen() {
                                     />
                                 </TouchableOpacity>
                             </View>
-                            <Text style={styles.promptText}>"{getDailyPrompt()}"</Text>
+                            <Text style={styles.promptText}>"{dailyPrompt.prompt || 'Loading...'}"</Text>
                         </View>
                     </>
                 )}

@@ -14,19 +14,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import MemoryRoad from '../../components/MemoryRoad';
 import MemoryPopup from '../../components/MemoryPopup';
 import { speakText, stopSpeaking } from '../../utils/elevenLabsTTS';
-
-const DAILY_PROMPTS = [
-    'What was your favourite meal your mother made?',
-    'Tell me about the first time you fell in love.',
-    'What did your neighborhood smell like in summer?',
-    'What was your proudest moment at work?',
-    'Who was your best friend growing up?',
-    'What was your favorite game to play as a child?',
-    'Describe a holiday tradition from your childhood.',
-    'What was the first job you ever had?',
-    'What song brings back the strongest memory?',
-    'Tell me about a place that felt like home.',
-];
+import { getDailyPrompt } from '../../utils/geminiPrompts';
 
 const getGreeting = () => {
     const hour = new Date().getHours();
@@ -44,19 +32,13 @@ const getFormattedDate = () => {
     });
 };
 
-const getDailyPrompt = () => {
-    const dayOfYear = Math.floor(
-        (Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000
-    );
-    return DAILY_PROMPTS[dayOfYear % DAILY_PROMPTS.length];
-};
-
 export default function HomeScreen({ navigation }) {
     const [userName, setUserName] = useState('');
     const [memories, setMemories] = useState([]);
     const [selectedMemory, setSelectedMemory] = useState(null);
     const [popupVisible, setPopupVisible] = useState(false);
     const [isSpeaking, setIsSpeaking] = useState(false);
+    const [promptText, setPromptText] = useState('');
 
     useFocusEffect(
         useCallback(() => {
@@ -68,6 +50,9 @@ export default function HomeScreen({ navigation }) {
                     const memoriesData = await AsyncStorage.getItem('memories');
                     const memList = memoriesData ? JSON.parse(memoriesData) : [];
                     setMemories(memList);
+
+                    const dailyPrompt = await getDailyPrompt();
+                    setPromptText(dailyPrompt.prompt);
                 } catch (e) {
                     console.log('Error loading data:', e);
                 }
@@ -82,7 +67,7 @@ export default function HomeScreen({ navigation }) {
             setIsSpeaking(false);
         } else {
             setIsSpeaking(true);
-            const success = await speakText(getDailyPrompt(), () => {
+            const success = await speakText(promptText, () => {
                 setIsSpeaking(false);
             });
             if (!success) setIsSpeaking(false);
@@ -122,7 +107,7 @@ export default function HomeScreen({ navigation }) {
                             />
                         </TouchableOpacity>
                     </View>
-                    <Text style={styles.promptText}>"{getDailyPrompt()}"</Text>
+                    <Text style={styles.promptText}>"{promptText || 'Loading...'}"</Text>
                     <TouchableOpacity
                         style={styles.recordButton}
                         onPress={() => navigation.navigate('Record')}
